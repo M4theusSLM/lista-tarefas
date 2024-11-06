@@ -151,3 +151,60 @@ const attachIconEvents = () => {
             }); 
         });
     };
+
+    const moveUp = (row) => {
+        const previousRow = row.previousElementSibling;
+        if (previousRow && previousRow.rowIndex !== 0) {
+            row.parentNode.insertBefore(row, previousRow);
+            atualizarOrdem();
+        }
+    };
+    
+    const moveDown = (row) => {
+        const nextRow = row.nextElementSibling;
+        if (nextRow) {
+            row.parentNode.insertBefore(nextRow, row);
+            atualizarOrdem();
+        }
+    };
+    
+    const atualizarOrdem = () => {
+        const rows = Array.from(document.querySelectorAll('table tr:not(:first-child)'));
+        rows.forEach((row, index) => {
+            const id = row.cells[0].innerText;
+            fetch(`/tarefas/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ordem: index + 1 }) // Atualizar a ordem no backend
+            })
+            .then(response => response.text())
+            .then(message => console.log(message));
+        });
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.move-up').forEach(button => {
+            button.addEventListener('click', () => moveUp(button.closest('tr')));
+        });
+    
+        document.querySelectorAll('.move-down').forEach(button => {
+            button.addEventListener('click', () => moveDown(button.closest('tr')));
+        });
+    });
+
+    app.put('/tarefas/:id', (req, res) => {
+        const { id } = req.params;
+        const { nome, custo, data_limite, ordem } = req.body;
+    
+        const sql = 'UPDATE Tarefas SET nome = ?, custo = ?, data_limite = ?, ordem = ? WHERE id = ?';
+        connection.query(sql, [nome, custo, data_limite, ordem, id], (err, result) => {
+            if (err) {
+                res.status(500).send('Erro ao atualizar a tarefa');
+                throw err;
+            }
+            res.send('Tarefa atualizada com sucesso!');
+        });
+    });
+    

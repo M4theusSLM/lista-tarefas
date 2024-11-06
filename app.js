@@ -64,7 +64,6 @@ window.onload = () => {
     }
 };
 
-  
   const editarTarefa = id => {
     const nome = prompt('Nome da Tarefa:');
     const custo = prompt('Custo:');
@@ -103,5 +102,28 @@ window.onload = () => {
     carregarTarefas();
     attachIconEvents();
   };
+
+  window.onload = () => {
+    carregarTarefas();
+
+    new Sortable(document.querySelector('table tbody'), {
+        animation: 150,
+        onEnd: (evt) => {
+            const rows = Array.from(document.querySelectorAll('table tr:not(:first-child)'));
+            rows.forEach((row, index) => {
+                const id = row.cells[0].innerText;
+                fetch(`/tarefas/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ordem: index + 1 }) // Atualizar a ordem no backend
+                })
+                .then(response => response.text())
+                .then(message => console.log(message));
+            });
+        }
+    });
+};
 
   

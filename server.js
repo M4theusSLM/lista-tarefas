@@ -61,10 +61,14 @@ app.delete('/tarefas/:id', (req, res) => {
 app.put('/tarefas/:id', (req, res) => {
   const { id } = req.params;
   const { nome, custo, data_limite } = req.body;
-  connection.query('UPDATE Tarefas SET nome = ?, custo = ?, data_limite = ? WHERE id = ?', [nome, custo, data_limite, id], (err, results) => {
-    if (err) throw err;
-    res.send('Tarefa atualizada com sucesso!');
-  });
+  const sql = 'UPDATE Tarefas SET nome = ?, custo = ?, data_limite = ?, ordem = ? WHERE id = ?'; 
+  connection.query(sql, [nome, custo, data_limite, ordem, id], (err, result) => { 
+    if (err) { 
+      res.status(500).send('Erro ao atualizar a tarefa'); 
+      throw err; 
+    } 
+    res.send('Tarefa atualizada com sucesso!'); 
+  }); 
 });
 
 app.get('/', (req, res) => {
