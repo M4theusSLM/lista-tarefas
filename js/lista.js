@@ -166,3 +166,49 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(error => console.error('Erro ao editar tarefa:', error));
     });
 });
+
+$(document).ready(function() {
+    $('.move-up').on('click', function() {
+        var tarefa = $(this).closest('tr');
+        var id = tarefa.data('id');
+        var ordemAtual = tarefa.data('ordem');
+
+        // Encontra a tarefa acima
+        var tarefaAcima = tarefa.prev('tr.tarefa');
+        if (tarefaAcima.length) {
+            var idAcima = tarefaAcima.data('id');
+            var ordemAcima = tarefaAcima.data('ordem');
+
+            // Atualiza a ordem no banco de dados
+            $.post('atualizar_ordem.php', { id: id, nova_ordem: ordemAcima });
+            $.post('atualizar_ordem.php', { id: idAcima, nova_ordem: ordemAtual });
+
+            // Atualiza a interface
+            tarefa.insertBefore(tarefaAcima);
+            tarefa.data('ordem', ordemAcima);
+            tarefaAcima.data('ordem', ordemAtual);
+        }
+    });
+
+    $('.move-down').on('click', function() {
+        var tarefa = $(this).closest('tr');
+        var id = tarefa.data('id');
+        var ordemAtual = tarefa.data('ordem');
+
+        // Encontra a tarefa abaixo
+        var tarefaAbaixo = tarefa.next('tr.tarefa');
+        if (tarefaAbaixo.length) {
+            var idAbaixo = tarefaAbaixo.data('id');
+            var ordemAbaixo = tarefaAbaixo.data('ordem');
+
+            // Atualiza a ordem no banco de dados
+            $.post('atualizar_ordem.php', { id: id, nova_ordem: ordemAbaixo });
+            $.post('atualizar_ordem.php', { id: idAbaixo, nova_ordem: ordemAtual });
+
+            // Atualiza a interface
+            tarefa.insertAfter(tarefaAbaixo);
+            tarefa.data('ordem', ordemAbaixo);
+            tarefaAbaixo.data('ordem', ordemAtual);
+        }
+    });
+});

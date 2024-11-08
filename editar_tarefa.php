@@ -10,21 +10,34 @@ $data_limite = $_POST['data_limite'] ?? '';
 // Verifica se o ID foi fornecido
 if ($id != '') {
     // Busca os dados atuais da tarefa
-    $sql = "SELECT nome, custo, data_limite FROM Tarefas WHERE id=$id";
-    $result = $conn->query($sql);
+    $sql = "SELECT nome, custo, data_limite FROM Tarefas WHERE id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id); // "i" indica um inteiro para o ID
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
 
         // Atualiza os campos apenas se novos valores forem fornecidos
         $nome = $nome !== '' ? $nome : $row['nome'];
-        $custo = $custo !== '' ? $custo : $row['custo'];
+
+        // Verifica se o custo é um número válido antes de atualizar
+        if (is_numeric($custo) && $custo >= 0) {
+            $custo = $custo;
+        } else {
+            $custo = $row['custo']; // Mantém o valor existente se o novo custo não for válido
+        }
+
         $data_limite = $data_limite !== '' ? $data_limite : $row['data_limite'];
 
-        // Atualiza a tarefa no banco de dados
-        $sql = "UPDATE Tarefas SET nome='$nome', custo='$custo', data_limite='$data_limite' WHERE id=$id";
+        // Constrói a consulta de atualização
+        $sql = "UPDATE Tarefas SET nome=?, custo=?, data_limite=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssi", $nome, $custo, $data_limite, $id); // "ssi" (string, string, string, integer)
 
-        if ($conn->query($sql) === TRUE) {
+        // Executa a consulta e verifica o sucesso
+        if ($stmt->execute()) {
             echo "Tarefa atualizada com sucesso";
         } else {
             echo "Erro ao atualizar tarefa: " . $conn->error;
@@ -36,5 +49,6 @@ if ($id != '') {
     echo "ID inválido!";
 }
 
+// Fecha a conexão
 $conn->close();
 ?>

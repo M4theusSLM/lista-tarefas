@@ -93,12 +93,12 @@ td i {
     justify-content: center;
 }
 
-.high-cost td {
-    background-color: #b2e9b0; 
+.high-cost {
+    background-color: #b2e9b0; /* Cor de fundo para tarefas com custo alto */
 }
 
 .high-cost:hover {
-    background-color: #a8d3a9; 
+    background-color: #b2e9b0; /* Mantém a mesma cor ao passar o mouse */
 }
 
 .popup-overlay {

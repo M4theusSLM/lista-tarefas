@@ -31,27 +31,31 @@ $conn->close();
     </div>
 
     <table>
-        <tr>
-            <th>ID</th>
-            <th>Nome da Tarefa</th>
-            <th>Custo</th>
-            <th>Data Limite</th>
-        </tr>
+    <tr>
+        <th>ID</th>
+        <th>Nome da Tarefa</th>
+        <th>Custo</th>
+        <th>Data Limite</th>
+    </tr>
 
-        <?php foreach ($tarefas as $tarefa): ?>
-        <tr>
-            <td><?php echo $tarefa['id']; ?></td>
-            <td><?php echo $tarefa['nome']; ?></td>
-            <td>R$<?php echo number_format($tarefa['custo'], 2, ',', '.'); ?></td>
-            <td><?php echo $tarefa['data_limite']; ?>
-                <button class="move-up">↑</button> 
-                <button class="move-down">↓</button>
-                <i class="fas fa-edit edit-icon"></i>
-                <i class="fas fa-trash delete-icon"></i>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    </table>
+    <?php foreach ($tarefas as $tarefa): ?>
+    <?php 
+        // Verifica se o custo é maior ou igual a R$1.000,00
+        $classe = $tarefa['custo'] >= 1000 ? 'high-cost' : ''; 
+    ?>
+    <tr class="tarefa <?php echo $classe; ?>" data-id="<?php echo $tarefa['id']; ?>" data-ordem="<?php echo $tarefa['ordem']; ?>">
+        <td><?php echo $tarefa['id']; ?></td>
+        <td><?php echo $tarefa['nome']; ?></td>
+        <td>R$<?php echo number_format($tarefa['custo'], 2, ',', '.'); ?></td>
+        <td><?php echo $tarefa['data_limite']; ?>
+            <button class="move-up">↑</button> 
+            <button class="move-down">↓</button>
+            <i class="fas fa-edit edit-icon"></i>
+            <i class="fas fa-trash delete-icon"></i>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</table>
 
     <div id="confirmPopup" class="popup-overlay">
     <div class="popup-content">
@@ -100,7 +104,7 @@ $conn->close();
     Adicionar Tarefa +
 </button>
 
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/lista.js"></script>
 </body>
 </html>
